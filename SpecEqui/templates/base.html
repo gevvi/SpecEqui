@@ -1,0 +1,18 @@
+
+<!DOCTYPE html>
+  <head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link type="text/css" href="{% static 'css/homepage.css' %}" rel="stylesheet" />
+    <title>{{title}}</title>
+  </head>
+  <body>
+    {% include "includes/header.html" %}
+    <main>
+      <div>
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+    {% include "includes/footer.html"%}
+  </body>
+</html>

@@ -1,0 +1,13 @@
+{% load footernav %}
+
+<footer>
+  {% get_categories as categories %}
+  <ul>
+    {% for cat in categories%}
+      <li>
+        <a href="">{{ cat }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+    
+</footer>

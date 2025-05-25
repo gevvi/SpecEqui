@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+
+<style>
+  .beck {
+      background: url("{% static 'img/main_image.jpg' %}") center center no-repeat;
+  }
+</style>
+
+<div class="beck">
+  <div class="header">
+      <h1>Аренда строительной техники на Кубани</h1>
+      <p class="subtitle">Возьмите в аренду краны, манипуляторы, погрузчики и автовышки для любого вида работ.</p>
+      <div class="divider"></div>
+      <a href="#" class="cta-button">Арендовать технику</a>
+  </div>
+</div>
+<div class="container">
+  <div class="equipment-grid">
+    {% for key, value in items.items %}
+    <div class="equipment-card animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:"0.1" }}s">
+      <div class="card-content">
+        <h3 class="equipment-name">{{ key }}</h3>
+        <p class="equipment-price">{{ value|intcomma }} ₽/час</p>
+        <button class="order-btn" onclick="openModal('{{ key }}')">Оставить заявку</button>
+      </div>
+    </div>
+    {% empty %}
+      <p>Техника не найдена</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Модальное окно -->
+<div id="orderModal" class="modal">
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal-container animate__animated animate__fadeIn">
+    <div class="modal-header">
+      <h2 id="modalTitle">Заявка на <span class="product-name"></span></h2>
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+    </div>
+    <form id="orderForm" method="post" action="{% url 'submit_order' %}">
+      {% csrf_token %}
+      <input type="hidden" id="productName" name="product_name">
+      <div class="form-group">
+        <input type="text" id="name" name="name" required class="form-input">
+        <label for="name" class="form-label">Ваше имя</label>
+      </div>
+      <div class="form-group">
+        <input type="tel" id="phone" name="phone" required class="form-input">
+        <label for="phone" class="form-label">Телефон</label>
+      </div>
+      <button type="submit" class="submit-btn">
+        <span>Отправить</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+
+
+<script>
+  function openModal(productName) {
+    document.getElementById('productName').value = productName;
+    document.querySelector('.product-name').textContent = productName;
+    document.getElementById('orderModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('orderModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('orderModal');
+    if (event.target === modal || event.target.classList.contains('modal-overlay')) {
+      closeModal();
+    }
+  }
+
+  // Плавное появление элементов при загрузке
+  document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.equipment-card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+  });
+</script>
+{% endblock %}
