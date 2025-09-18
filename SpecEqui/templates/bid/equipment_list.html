@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1>Каталог спецтехники</h1>
+  <form method="get" style="margin: 12px 0; display:flex; gap:8px; align-items:center;">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Поиск по названию" />
+    <select name="sort">
+      <option value="">Сортировка</option>
+      <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Цена ↑</option>
+      <option value="-price" {% if request.GET.sort == '-price' %}selected{% endif %}>Цена ↓</option>
+      <option value="new" {% if request.GET.sort == 'new' %}selected{% endif %}>Сначала новые</option>
+      <option value="old" {% if request.GET.sort == 'old' %}selected{% endif %}>Сначала старые</option>
+    </select>
+    <button type="submit">Применить</button>
+  </form>
+
+  <p><a href="{% url 'equipment_create' %}">Добавить технику</a></p>
+
+  <ul class="list-articles">
+    {% for eq in equipment_list %}
+      <li>
+        <h3><a href="{{ eq.get_absolute_url }}">{{ eq.title }}</a></h3>
+        <p>{{ eq.description|linebreaks|truncatewords:30 }}</p>
+        <p>Цена: {{ eq.price_per_hour }} ₽/час</p>
+      </li>
+    {% empty %}
+      <li>Нет опубликованных записей</li>
+    {% endfor %}
+  </ul>
+
+  {% if is_paginated %}
+    <div class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+      {% endif %}
+      <span>Стр. {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Вперед</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+

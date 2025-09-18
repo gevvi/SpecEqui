@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1>{{ equipment.title }}</h1>
+  <p><strong>Цена:</strong> {{ equipment.price_per_hour }} ₽/час</p>
+  <div>{{ equipment.description|linebreaks }}</div>
+  <p style="margin-top:12px;">
+    <a href="{% url 'equipment_update' equipment_slug=equipment.slug %}">Редактировать</a> |
+    <a href="{% url 'equipment_delete' equipment_slug=equipment.slug %}">Удалить</a> |
+    <a href="{% url 'equipment_list' %}">Назад к списку</a>
+  </p>
+</div>
+{% endblock %}
+

@@ -1,15 +1,14 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
+from bid.models import Equipment
 
 menu = ["O нас", "Автопарк", "Обратная связь",]
-items = {"Автокран" : 3000, 
-         "Манипулятор": 2800, 
-         "Экскаватор": 2500, 
-         "Автовышка": 2500}
+items = None
 
 def homepage(request):
+    equipment = Equipment.published.all()
     data = {'title': 'Главная страница',
-            'items': items}
+            'items': {e.title: int(e.price_per_hour) for e in equipment}}
     return render(request, 'homepage/homepage.html', data)
 
 
