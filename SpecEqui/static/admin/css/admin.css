@@ -1,0 +1,54 @@
+body {
+    background-color: #ad9f8c;
+    font-family: Arial, sans-serif;
+}
+
+#header {
+    background-color: #ad9f8c !important;
+    border-bottom: 2px solid #755730;
+}
+
+#header h1, #header a {
+    color: #07470a !important;
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background-color: #ad9f8c;
+    color: #07470a;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 1.05em;
+}
+
+div.breadcrumbs {
+    background-color: #ad9f8c;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    color: #755730;
+}
+
+.actions button, .submit-row input.default {
+    background-color: #ad9f8c !important;
+    color: #ffffff !important;
+    border: none;
+    padding: 6px 12px;
+    margin: 3px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.actions button:hover, .submit-row input.default:hover {
+    background-color: #ad9f8c !important;
+}
+
+
+#changelist-filter h2 {
+    background: #ad9f8c;
+    color: #755730;
+}
+
+
