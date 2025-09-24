@@ -22,6 +22,18 @@
         <h3><a href="{{ eq.get_absolute_url }}">{{ eq.title }}</a></h3>
         <p>{{ eq.description|linebreaks|truncatewords:30 }}</p>
         <p>Цена: {{ eq.price_per_hour }} ₽/час</p>
+        {% if eq.manufacturer %}
+        <p>Производитель: {{ eq.manufacturer.name }} ({{ eq.manufacturer.country }})</p>
+        {% endif %}
+        {% if eq.tags.all %}
+        <p>Теги:
+          {% for t in eq.tags.all %}
+            <a href="{% url 'tags_list' %}">{{ t.name }}</a>{% if not forloop.last %}, {% endif %}
+          {% empty %}
+            —
+          {% endfor %}
+        </p>
+        {% endif %}
       </li>
     {% empty %}
       <li>Нет опубликованных записей</li>

@@ -1,7 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Equipment
+from django.db.models import Q, F, Value, Count, Avg, Sum, DecimalField, ExpressionWrapper
+from django.db.models.functions import Concat
+from .models import Equipment, Tag, Manufacturer
+from decimal import Decimal
 
 
 class EquipmentListView(ListView):
@@ -11,7 +14,7 @@ class EquipmentListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = Equipment.published.all()
+        queryset = Equipment.published.select_related('manufacturer').prefetch_related('tags').all()
         q = self.request.GET.get('q')
         sort = self.request.GET.get('sort')
         if q:
@@ -37,13 +40,13 @@ class EquipmentDetailView(DetailView):
 
 class EquipmentCreateView(CreateView):
     model = Equipment
-    fields = ['title', 'slug', 'description', 'price_per_hour', 'status']
+    fields = ['title', 'slug', 'description', 'price_per_hour', 'status', 'manufacturer', 'tags']
     template_name = 'bid/equipment_form.html'
 
 
 class EquipmentUpdateView(UpdateView):
     model = Equipment
-    fields = ['title', 'slug', 'description', 'price_per_hour', 'status']
+    fields = ['title', 'slug', 'description', 'price_per_hour', 'status', 'manufacturer', 'tags']
     template_name = 'bid/equipment_form.html'
     slug_url_kwarg = 'equipment_slug'
 
@@ -58,4 +61,57 @@ class EquipmentDeleteView(DeleteView):
 def bidwindow(request, pk):
     return redirect('equipment_list')
 
-# Create your views here.
+def tags_list(request):
+    tags = Tag.objects.annotate(num_equipment=Count('equipment')).order_by('name')
+    return render(request, 'bid/tags_list.html', {
+        'title': 'Теги',
+        'tags': tags,
+    })
+
+
+def analytics_demo(request):
+    # Q: составные условия (пример: дороже 2500 или название содержит "Экскаватор")
+    q_equipment = Equipment.objects.filter(
+        Q(price_per_hour__gt=2500) | Q(title__icontains='экскават')
+    )
+
+    # F/Value: вычисляемые поля и константы
+    equipment_with_tax = Equipment.objects.annotate(
+        price_with_tax=ExpressionWrapper(
+            F('price_per_hour') * Value(Decimal('1.20')),
+            output_field=DecimalField(max_digits=12, decimal_places=2),
+        ),
+        status_message=Value('Отличная спецтехника'),
+    ).values('title', 'price_per_hour', 'price_with_tax', 'status_message')[:20]
+
+    # Агрегаты
+    totals = Equipment.objects.aggregate(
+        total_count=Count('id'),
+        avg_price=Avg('price_per_hour'),
+        sum_price=Sum('price_per_hour'),
+    )
+
+    # Группировка по производителю
+    by_manufacturer = (
+        Manufacturer.objects
+        .annotate(equipment_count=Count('equipment'))
+        .values('name', 'country', 'equipment_count')
+        .order_by('-equipment_count', 'name')
+    )
+
+    # Группировка по тегам
+    by_tag = (
+        Tag.objects
+        .annotate(equipment_count=Count('equipment'))
+        .values('name', 'equipment_count')
+        .order_by('-equipment_count', 'name')
+    )
+
+    context = {
+        'q_equipment': q_equipment[:20],
+        'equipment_with_tax': list(equipment_with_tax),
+        'totals': totals,
+        'by_manufacturer': list(by_manufacturer),
+        'by_tag': list(by_tag),
+    }
+    return render(request, 'bid/analytics.html', context)

@@ -19,6 +19,25 @@ class Equipment(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время обновления")
     status = models.IntegerField(choices=Status.choices, default=Status.DRAFT, verbose_name="Публикация")
+    
+    # Relations
+    # One-to-many: Производитель -> Единицы техники
+    manufacturer = models.ForeignKey(
+        'Manufacturer',
+        on_delete=models.SET_NULL,
+        related_name='equipment',
+        verbose_name="Производитель",
+        null=True,
+        blank=True,
+    )
+
+    # Many-to-many: Теги <-> Единицы техники
+    tags = models.ManyToManyField(
+        'Tag',
+        related_name='equipment',
+        verbose_name="Теги",
+        blank=True,
+    )
 
     objects = models.Manager()
     published = PublishedManager()
@@ -34,3 +53,48 @@ class Equipment(models.Model):
 
     def get_absolute_url(self):
         return reverse('equipment_detail', kwargs={'equipment_slug': self.slug})
+
+
+class Manufacturer(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Производитель")
+    country = models.CharField(max_length=100, verbose_name="Страна")
+
+    class Meta:
+        verbose_name = 'Производитель'
+        verbose_name_plural = 'Производители'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name="Тег")
+
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class EquipmentDetail(models.Model):
+    # One-to-one: Доп. сведения об единице техники
+    equipment = models.OneToOneField(
+        Equipment,
+        on_delete=models.CASCADE,
+        related_name='detail',
+        verbose_name="Единица техники",
+    )
+    engine = models.CharField(max_length=100, verbose_name="Двигатель")
+    transmission = models.CharField(max_length=100, verbose_name="Коробка передач")
+    mileage = models.PositiveIntegerField(verbose_name="Пробег, км", null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Характеристики техники'
+        verbose_name_plural = 'Характеристики техники'
+
+    def __str__(self):
+        return f"Детали {self.equipment.title}"

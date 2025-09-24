@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <h1>{{ title|default:'Теги' }}</h1>
+  <ul>
+    {% for tag in tags %}
+      <li>{{ tag.name }} — {{ tag.num_equipment }} ед.</li>
+    {% empty %}
+      <li>Тегов пока нет</li>
+    {% endfor %}
+  </ul>
+  <p><a href="{% url 'equipment_list' %}">К каталогу</a></p>
+</div>
+{% endblock %}
+
+
+
+

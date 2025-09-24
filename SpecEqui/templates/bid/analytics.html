@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <h1>Аналитика (Q, F, Value, агрегаты)</h1>
+
+  <h2>Сложная фильтрация (Q)</h2>
+  <ul>
+    {% for e in q_equipment %}
+      <li>{{ e.title }} — {{ e.price_per_hour }} ₽/час</li>
+    {% empty %}
+      <li>Ничего не найдено</li>
+    {% endfor %}
+  </ul>
+
+  <h2>Вычисляемые поля (F/Value)</h2>
+  <table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+      <th>Название</th>
+      <th>Цена</th>
+      <th>Цена с налогом (20%)</th>
+      <th>Статус</th>
+    </tr>
+    {% for e in equipment_with_tax %}
+    <tr>
+      <td>{{ e.title }}</td>
+      <td>{{ e.price_per_hour }}</td>
+      <td>{{ e.price_with_tax }}</td>
+      <td>{{ e.status_message }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Агрегаты</h2>
+  <p>Всего единиц техники: <strong>{{ totals.total_count }}</strong></p>
+  <p>Средняя цена: <strong>{{ totals.avg_price }}</strong></p>
+  <p>Сумма цен: <strong>{{ totals.sum_price }}</strong></p>
+
+  <h2>По производителям</h2>
+  <ul>
+    {% for row in by_manufacturer %}
+      <li>{{ row.name }} ({{ row.country }}) — {{ row.equipment_count }}</li>
+    {% empty %}
+      <li>Нет данных</li>
+    {% endfor %}
+  </ul>
+
+  <h2>По тегам</h2>
+  <ul>
+    {% for row in by_tag %}
+      <li>{{ row.name }} — {{ row.equipment_count }}</li>
+    {% empty %}
+      <li>Нет данных</li>
+    {% endfor %}
+  </ul>
+
+  <p><a href="{% url 'equipment_list' %}">К каталогу</a></p>
+</div>
+{% endblock %}
+
+
+
+
