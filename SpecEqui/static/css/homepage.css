@@ -453,3 +453,117 @@ body {
         gap: 10px;
     }
 }
+
+/* Стили для постраничной навигации */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    gap: 0.5rem;
+}
+
+.page-item {
+    display: inline-block;
+}
+
+.page-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: var(--primary);
+    text-decoration: none;
+    border: 1px solid var(--gray-light);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.page-link:hover {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    cursor: default;
+}
+
+.page-item.active .page-link:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Стили для списка оборудования */
+.list-articles {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.list-articles li {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.list-articles li:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.list-articles h3 {
+    margin: 0 0 1rem 0;
+    color: var(--dark);
+}
+
+.list-articles h3 a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.list-articles h3 a:hover {
+    color: var(--secondary);
+}
+
+.list-articles p {
+    margin: 0.5rem 0;
+    color: #666;
+}
+
+/* Стили для форм поиска и сортировки */
+form {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+form input[type="text"],
+form select {
+    padding: 0.5rem;
+    border: 1px solid var(--gray-light);
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+form button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+form button:hover {
+    background: var(--secondary);
+}

@@ -10,12 +10,12 @@ urlpatterns = [
     path('equipment/<slug:equipment_slug>/', views.EquipmentDetailView.as_view(), name='equipment_detail'),
     path('equipment/<slug:equipment_slug>/edit/', views.EquipmentUpdateView.as_view(), name='equipment_update'),
     path('equipment/<slug:equipment_slug>/delete/', views.EquipmentDeleteView.as_view(), name='equipment_delete'),
-    path('tags/', views.tags_list, name='tags_list'),
-    path('analytics/', views.analytics_demo, name='analytics_demo'),
+    path('tags/', views.TagsListView.as_view(), name='tags_list'),
+    path('analytics/', views.AnalyticsView.as_view(), name='analytics_demo'),
     
-    path('add-equipment-custom/', views.add_equipment_custom, name='add_equipment_custom'),
-    path('add-equipment-model/', views.add_equipment_model, name='add_equipment_model'),
-    path('upload/', views.upload_file, name='upload_file'),
+    path('add-equipment-custom/', views.AddEquipmentCustomView.as_view(), name='add_equipment_custom'),
+    path('add-equipment-model/', views.EquipmentCreateView.as_view(), name='add_equipment_model'),
+    path('upload/', views.UploadFileView.as_view(), name='upload_file'),
 ]
 
 # Подключение медиа-файлов для разработки
