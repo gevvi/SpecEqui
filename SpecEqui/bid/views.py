@@ -12,6 +12,7 @@ from django.db.models import Q, F, Value, Count, Avg, Sum, DecimalField, Express
 from django.db.models.functions import Concat
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Equipment, Tag, Manufacturer
 from .forms import EquipmentForm, EquipmentModelForm, UploadForm
 from .utils import DataMixin
@@ -78,29 +79,32 @@ class EquipmentDetailView(DataMixin, DetailView):
         return context
 
 
-class EquipmentCreateView(DataMixin, CreateView):
+class EquipmentCreateView(LoginRequiredMixin, DataMixin, CreateView):
     model = Equipment
     form_class = EquipmentModelForm
     template_name = 'bid/add_equipment_model.html'
     success_url = reverse_lazy('equipment_list')
     title = 'Добавить оборудование (ModelForm)'
+    login_url = reverse_lazy('users:login')
 
 
-class EquipmentUpdateView(DataMixin, UpdateView):
+class EquipmentUpdateView(LoginRequiredMixin, DataMixin, UpdateView):
     model = Equipment
     form_class = EquipmentModelForm
     template_name = 'bid/add_equipment_model.html'
     success_url = reverse_lazy('equipment_list')
     slug_url_kwarg = 'equipment_slug'
     title = 'Редактировать оборудование'
+    login_url = reverse_lazy('users:login')
 
 
-class EquipmentDeleteView(DataMixin, DeleteView):
+class EquipmentDeleteView(LoginRequiredMixin, DataMixin, DeleteView):
     model = Equipment
     template_name = 'bid/equipment_confirm_delete.html'
     success_url = reverse_lazy('equipment_list')
     slug_url_kwarg = 'equipment_slug'
     title = 'Удалить оборудование'
+    login_url = reverse_lazy('users:login')
 
 
 class TagsListView(DataMixin, ListView):
@@ -163,11 +167,12 @@ class AnalyticsView(DataMixin, TemplateView):
         return context
 
 
-class AddEquipmentCustomView(DataMixin, FormView):
+class AddEquipmentCustomView(LoginRequiredMixin, DataMixin, FormView):
     form_class = EquipmentForm
     template_name = 'bid/add_equipment_custom.html'
     success_url = reverse_lazy('equipment_list')
     title = 'Добавить оборудование (Form)'
+    login_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
         cd = form.cleaned_data

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">Ваш профиль</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Информация о пользователе</h5>
+                            <p><strong>Логин:</strong> {{ user.username }}</p>
+                            <p><strong>E-mail:</strong> {{ user.email }}</p>
+                            <p><strong>Имя:</strong> {{ user.first_name|default:"Не указано" }}</p>
+                            <p><strong>Фамилия:</strong> {{ user.last_name|default:"Не указано" }}</p>
+                            <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y H:i" }}</p>
+                            <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i"|default:"Никогда" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Действия</h5>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'users:password_change' %}" class="btn btn-warning">
+                                    Сменить пароль
+                                </a>
+                                <a href="{% url 'equipment_list' %}" class="btn btn-primary">
+                                    К списку оборудования
+                                </a>
+                                <a href="{% url 'users:logout' %}" class="btn btn-danger">
+                                    Выйти из системы
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -48,6 +48,11 @@ class Equipment(models.Model):
         indexes = [models.Index(fields=['-time_create'])]
         verbose_name = 'Единица техники'
         verbose_name_plural = 'Единицы техники'
+        permissions = [
+            ('can_publish_equipment', 'Может публиковать оборудование'),
+            ('can_manage_equipment', 'Может управлять оборудованием'),
+            ('can_view_equipment_analytics', 'Может просматривать аналитику оборудования'),
+        ]
 
     def __str__(self):
         return self.title
@@ -64,6 +69,9 @@ class Manufacturer(models.Model):
         verbose_name = 'Производитель'
         verbose_name_plural = 'Производители'
         ordering = ['name']
+        permissions = [
+            ('can_manage_manufacturers', 'Может управлять производителями'),
+        ]
 
     def __str__(self):
         return self.name
@@ -76,6 +84,9 @@ class Tag(models.Model):
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
         ordering = ['name']
+        permissions = [
+            ('can_manage_tags', 'Может управлять тегами'),
+        ]
 
     def __str__(self):
         return self.name

@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'homepage.apps.HomepageConfig',
     'bid.apps.BidConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -131,3 +132,28 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Authentication settings
+LOGIN_URL = 'users:login'
+LOGIN_REDIRECT_URL = 'equipment_list'
+LOGOUT_REDIRECT_URL = 'equipment_list'
+
+# Email settings for password reset
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 587  # Правильный порт для Yandex с TLS
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'danielalyohin@yandex.ru'
+EMAIL_HOST_PASSWORD = 'rvpibhbuiptjkpph'
+DEFAULT_FROM_EMAIL = 'SpecEqui <danielalyohin@yandex.ru>'
+
+# Email encoding settings
+EMAIL_USE_LOCALTIME = True
+
+# Настройки для сброса пароля
+PASSWORD_RESET_TIMEOUT = 3600  # Время жизни ссылки сброса пароля (1 час)
+
+# Custom authentication backend
+AUTHENTICATION_BACKENDS = [
+    'users.backends.EmailOrUsernameBackend',
+]

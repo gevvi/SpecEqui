@@ -5,7 +5,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('homepage.urls')),
-    path('', include('bid.urls')),
+    path('equipment/', include('bid.urls')),
+    path('users/', include('users.urls')),
 ]
 
 # Customize Django admin titles for SpecEqui

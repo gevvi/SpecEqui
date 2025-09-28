@@ -7,9 +7,9 @@ from . import views
 urlpatterns = [
     path('equipment/', views.EquipmentListView.as_view(), name='equipment_list'),
     path('equipment/create/', views.EquipmentCreateView.as_view(), name='equipment_create'),
-    path('equipment/<slug:equipment_slug>/', views.EquipmentDetailView.as_view(), name='equipment_detail'),
     path('equipment/<slug:equipment_slug>/edit/', views.EquipmentUpdateView.as_view(), name='equipment_update'),
     path('equipment/<slug:equipment_slug>/delete/', views.EquipmentDeleteView.as_view(), name='equipment_delete'),
+    path('equipment/<slug:equipment_slug>/', views.EquipmentDetailView.as_view(), name='equipment_detail'),
     path('tags/', views.TagsListView.as_view(), name='tags_list'),
     path('analytics/', views.AnalyticsView.as_view(), name='analytics_demo'),
     
