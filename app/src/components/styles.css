@@ -1,0 +1,101 @@
+.equipment-form {
+  width: 300px;
+  margin: 0 auto 20px; /* выравнивание по центру и отступ снизу */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+/* Появляется, когда validate() нашёл ошибку */
+.form-group input.invalid,
+.form-group textarea.invalid {
+  border-color: #e74c3c;       /* красная рамка */
+  background-color: #fbeaea;   /* лёгкий розовый фон */
+}
+
+.error-text {
+  color: #e74c3c;    /* цвет текста ошибки */
+  font-size: 0.9em;
+  margin-top: 3px;
+}
+
+.btn-submit {
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-submit:hover {
+  background-color: #2980b9;
+}
+
+.list-articles {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.equipment-item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #f9f9f9;
+}
+
+.sort-container {
+  max-width: 600px;
+  margin: 10px auto;
+  display: flex;
+  align-items: center;
+}
+
+.sort-container label {
+  margin-right: 8px;
+}
+
+/* Стили для пагинации (Пункт 3.3) */
+.pagination-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-nav button,
+.pagination-nav .page-number {
+  margin: 0 5px;
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination-nav .page-number.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #2980b9;
+  cursor: default; 
+}
