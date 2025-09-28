@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Добавить спецтехнику (связанная форма){% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Добавить спецтехнику (связанная форма)</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+            <small class="form-text text-muted">{{ form.title.help_text }}</small>
+            {{ form.title.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.slug.id_for_label }}">{{ form.slug.label }}</label>
+            {{ form.slug }}
+            {{ form.slug.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.price_per_hour.id_for_label }}">{{ form.price_per_hour.label }}</label>
+            {{ form.price_per_hour }}
+            <small class="form-text text-muted">{{ form.price_per_hour.help_text }}</small>
+            {{ form.price_per_hour.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
+            {{ form.manufacturer }}
+            {{ form.manufacturer.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.tags.id_for_label }}">{{ form.tags.label }}</label>
+            {{ form.tags }}
+            {{ form.tags.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+            {{ form.status }}
+            {{ form.status.errors }}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            {{ form.image }}
+            {{ form.image.errors }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+
+<style>
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"], 
+input[type="number"], 
+textarea, 
+select,
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.errorlist {
+    color: red;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.form-text {
+    font-size: 0.875em;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

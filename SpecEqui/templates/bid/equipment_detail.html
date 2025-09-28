@@ -2,6 +2,14 @@
 {% block content %}
 <div class="container">
   <h1>{{ equipment.title }}</h1>
+  
+  {# Отображение изображения техники #}
+  {% if equipment.image %}
+    <div style="margin-bottom: 20px;">
+      <img src="{{ equipment.image.url }}" alt="{{ equipment.title }}" style="max-width:100%; height:auto; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    </div>
+  {% endif %}
+  
   <p><strong>Цена:</strong> {{ equipment.price_per_hour }} ₽/час</p>
   {% if equipment.manufacturer %}
   <p><strong>Производитель:</strong> {{ equipment.manufacturer.name }} ({{ equipment.manufacturer.country }})</p>

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}Загрузка файлов{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Загрузка файлов на сервер</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <div class="form-group">
+            <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+            {{ form.file }}
+            <small class="form-text text-muted">{{ form.file.help_text }}</small>
+            {{ form.file.errors }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Загрузить файл</button>
+    </form>
+    
+    {% if link %}
+        <div class="alert alert-success">
+            <h3>Файл успешно загружен!</h3>
+            <p>Ссылка для скачивания: <a href="{{ link }}" target="_blank">{{ link }}</a></p>
+            <p><strong>Примечание:</strong> Файл сохранен с уникальным именем для предотвращения конфликтов.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.errorlist {
+    color: red;
+    list-style: none;
+    padding: 0;
+    margin: 5px 0 0 0;
+}
+
+.form-text {
+    font-size: 0.875em;
+    color: #6c757d;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert h3 {
+    margin-top: 0;
+    color: #155724;
+}
+
+.alert a {
+    color: #155724;
+    text-decoration: underline;
+}
+</style>
+{% endblock %}

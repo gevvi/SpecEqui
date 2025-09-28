@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from . import views
 
@@ -10,4 +12,12 @@ urlpatterns = [
     path('equipment/<slug:equipment_slug>/delete/', views.EquipmentDeleteView.as_view(), name='equipment_delete'),
     path('tags/', views.tags_list, name='tags_list'),
     path('analytics/', views.analytics_demo, name='analytics_demo'),
+    
+    path('add-equipment-custom/', views.add_equipment_custom, name='add_equipment_custom'),
+    path('add-equipment-model/', views.add_equipment_model, name='add_equipment_model'),
+    path('upload/', views.upload_file, name='upload_file'),
 ]
+
+# Подключение медиа-файлов для разработки
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

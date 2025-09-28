@@ -19,6 +19,7 @@ class Equipment(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, verbose_name="Время создания")
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время обновления")
     status = models.IntegerField(choices=Status.choices, default=Status.DRAFT, verbose_name="Публикация")
+    image = models.ImageField(upload_to='equipment_images/', blank=True, null=True, verbose_name="Изображение техники")
     
     # Relations
     # One-to-many: Производитель -> Единицы техники

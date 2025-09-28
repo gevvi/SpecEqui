@@ -1,10 +1,49 @@
+import os
+import uuid
+import re
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.db.models import Q, F, Value, Count, Avg, Sum, DecimalField, ExpressionWrapper
 from django.db.models.functions import Concat
+from django.conf import settings
+from django.core.files.storage import default_storage
 from .models import Equipment, Tag, Manufacturer
+from .forms import EquipmentForm, EquipmentModelForm, UploadForm
 from decimal import Decimal
+
+
+def generate_slug(title):
+    """Генерирует slug из названия с транслитерацией кириллицы"""
+    # Словарь для транслитерации кириллицы
+    translit_dict = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e',
+        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+        'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch',
+        'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+    }
+    
+    # Приводим к нижнему регистру и транслитерируем
+    slug = title.lower()
+    for cyr, lat in translit_dict.items():
+        slug = slug.replace(cyr, lat)
+    
+    # Удаляем все символы кроме букв, цифр и дефисов
+    slug = re.sub(r'[^a-z0-9\-]', '-', slug)
+    
+    # Удаляем множественные дефисы
+    slug = re.sub(r'-+', '-', slug)
+    
+    # Удаляем дефисы в начале и конце
+    slug = slug.strip('-')
+    
+    # Если slug пустой, используем fallback
+    if not slug:
+        slug = 'equipment'
+    
+    return slug
 
 
 class EquipmentListView(ListView):
@@ -115,3 +154,75 @@ def analytics_demo(request):
         'by_tag': list(by_tag),
     }
     return render(request, 'bid/analytics.html', context)
+
+
+def add_equipment_custom(request):
+
+    if request.method == 'POST':
+        form = EquipmentForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            # Генерируем уникальный slug
+            base_slug = generate_slug(cd['title'])
+            slug = base_slug
+            counter = 1
+            while Equipment.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            # Создаём новый объект без использования ModelForm
+            equipment = Equipment.objects.create(
+                title=cd['title'],
+                slug=slug,
+                description=cd['description'],
+                price_per_hour=cd['price_per_hour'],
+                status=Equipment.Status.DRAFT
+            )
+            # Сохраняем изображение, если пользователь его загрузил
+            image = cd.get('image')
+            if image:
+                equipment.image = image
+                equipment.save()
+            return redirect(equipment.get_absolute_url())
+    else:
+        form = EquipmentForm()
+
+    return render(request, 'bid/add_equipment_custom.html', {'form': form})
+
+
+def add_equipment_model(request):
+
+    if request.method == 'POST':
+        form = EquipmentModelForm(request.POST, request.FILES)
+        if form.is_valid():
+            equipment = form.save(commit=False)
+            equipment.status = Equipment.Status.DRAFT
+            equipment.save()
+            form.save_m2m()
+            return redirect(equipment.get_absolute_url())
+    else:
+        form = EquipmentModelForm()
+
+    return render(request, 'bid/add_equipment_model.html', {'form': form})
+
+
+def upload_file(request):
+
+    link = None
+
+    if request.method == 'POST':
+        form = UploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            f = form.cleaned_data['file']
+            ext = os.path.splitext(f.name)[1]
+            new_name = f"{uuid.uuid4().hex}{ext}"
+            path = os.path.join('uploads', new_name)
+            saved_path = default_storage.save(path, f)
+            link = settings.MEDIA_URL + saved_path
+    else:
+        form = UploadForm()
+
+    return render(request, 'bid/upload.html', {
+        'form': form,
+        'link': link,
+    })

@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
+from django.utils.html import mark_safe
 from .models import Equipment, Manufacturer, Tag, EquipmentDetail
 
 
@@ -13,6 +14,13 @@ def price_with_fee(obj):
     if obj.price_per_hour is None:
         return "0.00"
     return f"{round(float(obj.price_per_hour) * 1.15, 2)}"
+
+
+@admin.display(description='Превью изображения')
+def image_preview(obj):
+    if obj.image:
+        return mark_safe(f"<img src='{obj.image.url}' style='max-height:200px; max-width:200px; border-radius: 4px;' />")
+    return "(нет изображения)"
 
 
 class PriceRangeFilter(SimpleListFilter):
@@ -46,7 +54,7 @@ class EquipmentDetailInline(admin.StackedInline):
 @admin.register(Equipment)
 class EquipmentAdmin(admin.ModelAdmin):
     # Список
-    list_display = ("id", "title", "manufacturer", "price_per_hour", price_with_fee, "status", "time_create", brief_info)
+    list_display = ("id", "title", "manufacturer", "price_per_hour", price_with_fee, "status", "time_create", brief_info, image_preview)
     list_display_links = ("id", "title")
     list_editable = ("status",)
     ordering = ("-time_create", "title")
@@ -55,7 +63,7 @@ class EquipmentAdmin(admin.ModelAdmin):
     list_filter = ("status", "manufacturer", PriceRangeFilter, "time_create", "tags")
 
     # Формы
-    fields = ("title", "slug", "description", "manufacturer", "tags", "price_per_hour", "status", "time_create", "time_update")
+    fields = ("title", "slug", "description", "manufacturer", "tags", "price_per_hour", "image", "status", "time_create", "time_update")
     readonly_fields = ("time_create", "time_update")
     prepopulated_fields = {"slug": ("title",)}
 
