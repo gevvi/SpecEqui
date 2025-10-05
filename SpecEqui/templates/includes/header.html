@@ -17,6 +17,7 @@
           <a href="{% url 'users:logout' %}" class="auth-link">Выйти</a>
         {% else %}
           <a href="{% url 'users:login' %}" class="auth-link">Войти</a>
+          <a href="{% url 'users:register' %}" class="auth-link">Регистрация</a>
         {% endif %}
       </div>
       <button class="occasion-btn">Оставить заявку</button>

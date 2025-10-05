@@ -7,14 +7,16 @@ from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView,
     TemplateView, FormView
 )
+from django.views import View
 from django.urls import reverse_lazy
 from django.db.models import Q, F, Value, Count, Avg, Sum, DecimalField, ExpressionWrapper
 from django.db.models.functions import Concat
 from django.conf import settings
 from django.core.files.storage import default_storage
-from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Equipment, Tag, Manufacturer
-from .forms import EquipmentForm, EquipmentModelForm, UploadForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import JsonResponse
+from .models import Equipment, Tag, Manufacturer, Comment
+from .forms import EquipmentForm, EquipmentModelForm, UploadForm, CommentForm
 from .utils import DataMixin
 from decimal import Decimal
 
@@ -47,7 +49,7 @@ class EquipmentListView(DataMixin, ListView):
     template_name = 'bid/equipment_list.html'
     context_object_name = 'equipment_list'
     paginate_by = 5
-    title = 'Специальное оборудование'
+    title = 'Спецтехника'
 
     def get_queryset(self):
         queryset = Equipment.published.select_related('manufacturer').prefetch_related('tags').all()
@@ -76,6 +78,10 @@ class EquipmentDetailView(DataMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = context['equipment'].title
+        context['comment_form'] = CommentForm()
+        context['likes_count'] = context['equipment'].likes.count()
+        user = self.request.user
+        context['has_liked'] = user.is_authenticated and context['equipment'].likes.filter(id=user.id).exists()
         return context
 
 
@@ -87,8 +93,12 @@ class EquipmentCreateView(LoginRequiredMixin, DataMixin, CreateView):
     title = 'Добавить оборудование (ModelForm)'
     login_url = reverse_lazy('users:login')
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
-class EquipmentUpdateView(LoginRequiredMixin, DataMixin, UpdateView):
+
+class EquipmentUpdateView(LoginRequiredMixin, UserPassesTestMixin, DataMixin, UpdateView):
     model = Equipment
     form_class = EquipmentModelForm
     template_name = 'bid/add_equipment_model.html'
@@ -97,14 +107,22 @@ class EquipmentUpdateView(LoginRequiredMixin, DataMixin, UpdateView):
     title = 'Редактировать оборудование'
     login_url = reverse_lazy('users:login')
 
+    def test_func(self):
+        equipment = self.get_object()
+        return equipment.owner_id == self.request.user.id or self.request.user.is_staff
 
-class EquipmentDeleteView(LoginRequiredMixin, DataMixin, DeleteView):
+
+class EquipmentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DataMixin, DeleteView):
     model = Equipment
     template_name = 'bid/equipment_confirm_delete.html'
     success_url = reverse_lazy('equipment_list')
     slug_url_kwarg = 'equipment_slug'
     title = 'Удалить оборудование'
     login_url = reverse_lazy('users:login')
+
+    def test_func(self):
+        equipment = self.get_object()
+        return equipment.owner_id == self.request.user.id or self.request.user.is_staff
 
 
 class TagsListView(DataMixin, ListView):
@@ -188,7 +206,8 @@ class AddEquipmentCustomView(LoginRequiredMixin, DataMixin, FormView):
             slug=slug,
             description=cd['description'],
             price_per_hour=cd['price_per_hour'],
-            status=Equipment.Status.DRAFT
+            status=Equipment.Status.DRAFT,
+            owner=self.request.user,
         )
         
         image = cd.get('image')
@@ -217,3 +236,33 @@ class UploadFileView(DataMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['link'] = self.request.session.get('uploaded_file_link')
         return context
+
+
+class AddCommentView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('users:login')
+
+    def post(self, request, equipment_slug):
+        equipment = get_object_or_404(Equipment, slug=equipment_slug)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            Comment.objects.create(
+                equipment=equipment,
+                author=request.user,
+                text=form.cleaned_data['text']
+            )
+        return redirect('equipment_detail', equipment_slug=equipment.slug)
+
+
+class ToggleLikeView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('users:login')
+
+    def post(self, request, equipment_slug):
+        equipment = get_object_or_404(Equipment, slug=equipment_slug)
+        user = request.user
+        liked = False
+        if equipment.likes.filter(id=user.id).exists():
+            equipment.likes.remove(user)
+        else:
+            equipment.likes.add(user)
+            liked = True
+        return JsonResponse({'liked': liked, 'likesCount': equipment.likes.count()})

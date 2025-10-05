@@ -1,5 +1,5 @@
 from django import forms
-from .models import Equipment
+from .models import Equipment, Comment
 
 
 # 1. Собственный валидатор: проверка заглавной буквы в начале названия
@@ -102,3 +102,12 @@ class UploadForm(forms.Form):
         if f.size > 10 * 1024 * 1024:
             raise forms.ValidationError('Файл слишком большой (больше 10 МБ)')
         return f
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Оставьте комментарий...'})
+        }

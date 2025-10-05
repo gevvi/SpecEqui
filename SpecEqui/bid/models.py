@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.conf import settings
 
 
 class PublishedManager(models.Manager):
@@ -20,6 +21,15 @@ class Equipment(models.Model):
     time_update = models.DateTimeField(auto_now=True, verbose_name="Время обновления")
     status = models.IntegerField(choices=Status.choices, default=Status.DRAFT, verbose_name="Публикация")
     image = models.ImageField(upload_to='equipment_images/', blank=True, null=True, verbose_name="Изображение техники")
+    # Владелец записи (пользователь, создавший технику)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='owned_equipment',
+        verbose_name='Владелец'
+    )
     
     # Relations
     # One-to-many: Производитель -> Единицы техники
@@ -110,3 +120,40 @@ class EquipmentDetail(models.Model):
 
     def __str__(self):
         return f"Детали {self.equipment.title}"
+
+
+class Comment(models.Model):
+    equipment = models.ForeignKey(
+        Equipment,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Оборудование'
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='equipment_comments',
+        verbose_name='Автор'
+    )
+    text = models.TextField(verbose_name='Комментарий')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return f"{self.author}: {self.text[:30]}"
+
+
+# Простая реализация лайков: M2M между Equipment и пользователями
+Equipment.add_to_class(
+    'likes',
+    models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        related_name='liked_equipment',
+        blank=True,
+        verbose_name='Лайки'
+    )
+)

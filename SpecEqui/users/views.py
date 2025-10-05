@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import (
     PasswordChangeView, PasswordChangeDoneView,
     PasswordResetView, PasswordResetDoneView,
@@ -95,3 +96,18 @@ class CustomPasswordResetCompleteView(PasswordResetCompleteView):
     Шаг 4: страница, показываемая после успешного сброса пароля.
     """
     template_name = 'users/password_reset_complete.html'
+
+
+def register(request):
+    """
+    Регистрация нового пользователя.
+    """
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('equipment_list')
+    else:
+        form = UserCreationForm()
+    return render(request, 'users/register.html', {'form': form})

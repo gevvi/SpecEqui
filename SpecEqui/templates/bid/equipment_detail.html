@@ -28,10 +28,62 @@
     {% endfor %}
   </p>
   <p style="margin-top:12px;">
-    <a href="{% url 'equipment_update' equipment_slug=equipment.slug %}">Редактировать</a> |
-    <a href="{% url 'equipment_delete' equipment_slug=equipment.slug %}">Удалить</a> |
+    {% if user.is_authenticated and user.is_staff %}
+      <a href="{% url 'equipment_update' equipment_slug=equipment.slug %}">Редактировать</a> |
+      <a href="{% url 'equipment_delete' equipment_slug=equipment.slug %}">Удалить</a> |
+    {% elif user.is_authenticated and equipment.owner_id == user.id %}
+      <a href="{% url 'equipment_update' equipment_slug=equipment.slug %}">Редактировать</a> |
+      <a href="{% url 'equipment_delete' equipment_slug=equipment.slug %}">Удалить</a> |
+    {% endif %}
     <a href="{% url 'equipment_list' %}">Назад к списку</a>
   </p>
+
+  <div style="margin-top:16px;">
+    <button id="likeBtn" class="btn btn-outline-primary btn-sm" data-liked="{{ has_liked|yesno:'1,0' }}">
+      ❤ <span id="likesCount">{{ likes_count }}</span>
+    </button>
+  </div>
+
+  <hr>
+  <h3>Комментарии</h3>
+  <div>
+    {% for c in equipment.comments.all %}
+      <div style="padding:8px 0;border-bottom:1px solid #eee;">
+        <strong>{{ c.author.username }}</strong>
+        <span class="text-muted" style="font-size:12px;">{{ c.created_at|date:"d.m.Y H:i" }}</span>
+        <div>{{ c.text|linebreaks }}</div>
+      </div>
+    {% empty %}
+      <p>Пока нет комментариев.</p>
+    {% endfor %}
+  </div>
+
+  {% if user.is_authenticated %}
+    <form method="post" action="{% url 'equipment_add_comment' equipment_slug=equipment.slug %}" style="margin-top:12px;">
+      {% csrf_token %}
+      {{ comment_form.as_p }}
+      <button type="submit" class="btn btn-primary">Отправить</button>
+    </form>
+  {% else %}
+    <p><a href="{% url 'users:login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить комментарий.</p>
+  {% endif %}
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var likeBtn = document.getElementById('likeBtn');
+  if (!likeBtn) return;
+  likeBtn.addEventListener('click', function() {
+    fetch('{% url "equipment_toggle_like" equipment_slug=equipment.slug %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('likesCount').textContent = data.likesCount;
+      likeBtn.dataset.liked = data.liked ? '1' : '0';
+    });
+  });
+});
+</script>
 {% endblock %}
 
